@@ -14,4 +14,4 @@ Antes de empezar, asegúrate de tener instalado lo siguiente:
 
 1. Abre una terminal y clona este repositorio:
    ```bash
-   git clone https://github.com/usuario/spring-boot-h2-example.git
+   git clone https://github.com/DiegoMendez01/crud_springboot_h2.git
