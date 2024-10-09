@@ -6,13 +6,17 @@ import com.parcialuno.backend.mappers.ProductMapper;
 import com.parcialuno.backend.models.Category;
 import com.parcialuno.backend.models.Product;
 import com.parcialuno.backend.services.CategoryService;
+import com.parcialuno.backend.services.EmailService;
 import com.parcialuno.backend.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +32,8 @@ public class ProductController
 
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/all")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
@@ -55,6 +61,7 @@ public class ProductController
 
         Product product = productMapper.toEntity(productDTO);
         Product newProduct = productService.save(product);
+        emailService.sendEmail("dieguinquip@gmail.com", "Producto creado", "Se ha creado un producto");
         return new ResponseEntity<>(productMapper.toDto(newProduct), HttpStatus.CREATED);
     }
 
@@ -73,5 +80,21 @@ public class ProductController
     public ResponseEntity<Void> deleteProduct(@RequestParam Integer id) {
         productService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/file")
+    public ResponseEntity<String> saveFile(@RequestParam(name = "file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El archivo está vacío.");
+        }
+
+        try {
+            // Guardar el archivo en el sistema de archivos
+            String filePath = "C:\\Users\\HP\\OneDrive\\Desktop\\pruebasImgSpring/" + file.getOriginalFilename();
+            file.transferTo(new File(filePath));
+            return ResponseEntity.ok("Archivo subido con éxito: " + file.getOriginalFilename());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el archivo.");
+        }
     }
 }
