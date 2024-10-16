@@ -35,7 +35,7 @@ public class ProductController
     @Autowired
     private EmailService emailService;
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         List<Product> products = productService.findAll();
         List<ProductDTO> productDTOs = products.stream()
@@ -51,7 +51,7 @@ public class ProductController
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Object> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         Optional<Category> categoryOptional = categoryService.findById(productDTO.getCategoryId());
         if (!categoryOptional.isPresent()) {

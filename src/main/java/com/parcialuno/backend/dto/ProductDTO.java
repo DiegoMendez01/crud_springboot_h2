@@ -24,6 +24,8 @@ public class ProductDTO
     @Positive(message = "El precio debe ser mayor que cero")
     private Double price;
 
+    private String image;
+
     @NotNull(message = "La categoria es obligatorio")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer categoryId; // Solo ID de la categoría

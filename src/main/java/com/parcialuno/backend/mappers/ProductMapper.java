@@ -22,6 +22,7 @@ public class ProductMapper {
                 product.getId(),
                 product.getName(),
                 product.getPrice(),
+                product.getImage(),
                 product.getCategory() != null ? product.getCategory().getId() : null, // Solo ID de la categoría
                 product.getCreatedAt(),
                 product.getUpdatedAt()
@@ -34,6 +35,7 @@ public class ProductMapper {
         product.setId(productDTO.getId());
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
+        product.setImage(productDTO.getImage());
 
         if (productDTO.getCategoryId() != null) {
             Optional<Category> categoryOptional = categoryService.findById(productDTO.getCategoryId());
