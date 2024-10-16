@@ -32,6 +32,7 @@ public class ProductController
 
     @Autowired
     private ProductMapper productMapper;
+
     @Autowired
     private EmailService emailService;
 
@@ -82,19 +83,31 @@ public class ProductController
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/file")
-    public ResponseEntity<String> saveFile(@RequestParam(name = "file") MultipartFile file) {
+    @PutMapping("/file/{id}")
+    public ResponseEntity<?> saveFile(@PathVariable("id") Integer id, @RequestParam(name = "file") MultipartFile file) {
         if (file.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El archivo está vacío.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDTO("El archivo está vacío."));
         }
 
-        try {
-            // Guardar el archivo en el sistema de archivos
-            String filePath = "C:\\Users\\HP\\OneDrive\\Desktop\\pruebasImgSpring/" + file.getOriginalFilename();
-            file.transferTo(new File(filePath));
-            return ResponseEntity.ok("Archivo subido con éxito: " + file.getOriginalFilename());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el archivo.");
+        // Buscar el producto por ID
+        Optional<Product> optionalProduct = productService.findById(id);
+        if (!optionalProduct.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Producto no encontrado."));
         }
+
+        Product product = optionalProduct.get();
+
+        // Guardar el archivo en una ubicación específica (por ejemplo, 'uploads/')
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+        // Actualizar el campo "image" del producto
+        product.setImage(fileName);
+        Product updatedProduct = productService.save(product);
+
+        // Convertir el producto actualizado a ProductDTO
+        ProductDTO productDTO = productMapper.toDto(updatedProduct);
+
+        // Devolver el ProductDTO actualizado con la imagen
+        return ResponseEntity.ok(productDTO);
     }
 }
